@@ -9,6 +9,7 @@ env:
   CONFIG_FILE: N1-LEDE/.config
   DIY_SH: N1-LEDE/diy.sh
   FILES: N1-LEDE/files
+  PACKIT_MIN_FREE_GB: 10
   TZ: Asia/Shanghai
 
 jobs:
@@ -145,10 +146,40 @@ jobs:
         cd openwrt
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
-        echo "compile_status=success" >> $GITHUB_ENV
+
+    - name: Pre-package cleanup and disk check
+      if: ${{ success() && !cancelled() }}
+      run: |
+        set -e
+        echo "[INFO] Disk usage before cleanup"
+        df -hT
+
+        ROOTFS_FILE=$(find openwrt/bin/targets -type f -name 'openwrt-amlogic-mesongx-phicomm_n1-rootfs.tar.gz' | head -n 1)
+        if [ -z "$ROOTFS_FILE" ]; then
+          echo "[ERROR] Rootfs tarball not found, cannot continue packaging."
+          exit 1
+        fi
+
+        echo "[INFO] Keep file: $ROOTFS_FILE"
+        cd openwrt
+        sudo rm -rf build_dir staging_dir tmp logs dl
+        find bin/targets -type f ! -name 'openwrt-amlogic-mesongx-phicomm_n1-rootfs.tar.gz' -delete
+        find bin/targets -type d -empty -delete
+        cd ..
+
+        echo "[INFO] Disk usage after cleanup"
+        df -hT
+
+        AVAIL_GB=$(df -BG / | awk 'NR==2 {gsub("G", "", $4); print $4}')
+        if [ "$AVAIL_GB" -lt "$PACKIT_MIN_FREE_GB" ]; then
+          echo "[ERROR] Insufficient disk space before packaging: ${AVAIL_GB}G available, need >= ${PACKIT_MIN_FREE_GB}G."
+          exit 1
+        fi
+
+        echo "[INFO] Disk check passed: ${AVAIL_GB}G available."
 
     - name: Package OpenWrt Firmware
-      if: ${{ env.compile_status }} == 'success' && !cancelled()
+      if: ${{ success() && !cancelled() }}
       uses: unifreq/openwrt_packit@master
       env:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/openwrt-amlogic-mesongx-phicomm_n1-rootfs.tar.gz
@@ -158,10 +189,23 @@ jobs:
         WHOAMI: fightroad
         SW_FLOWOFFLOAD: 1
         SFE_FLOW: 0
+
+    - name: Check packit output directory
+      id: check_packit_output
+      if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
+      run: |
+        if [ -d /opt/openwrt_packit/output ] && [ -n "$(ls -A /opt/openwrt_packit/output 2>/dev/null)" ]; then
+          echo "[INFO] Found packit output files:"
+          ls -lah /opt/openwrt_packit/output
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "[WARN] /opt/openwrt_packit/output not found or empty, skip release upload."
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
        
     - name: Upload OpenWrt Firmware to Release
       uses: ncipollo/release-action@main
-      if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled()
+      if: ${{ env.PACKAGED_STATUS == 'success' && steps.check_packit_output.outputs.exists == 'true' && !cancelled() }}
       with:
         tag: OpenWrt_N1_${{ env.PACKAGED_OUTPUTDATE }}
         artifacts: /opt/openwrt_packit/output/*
