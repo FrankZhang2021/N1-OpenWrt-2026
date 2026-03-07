@@ -9,7 +9,7 @@ env:
   CONFIG_FILE: N1-LEDE/.config
   DIY_SH: N1-LEDE/diy.sh
   FILES: N1-LEDE/files
-  PACKIT_MIN_FREE_GB: 10
+  PACKIT_MIN_FREE_GB: 6
   TZ: Asia/Shanghai
 
 jobs:
@@ -163,6 +163,7 @@ jobs:
         echo "[INFO] Keep file: $ROOTFS_FILE"
         cd openwrt
         sudo rm -rf build_dir staging_dir tmp logs dl
+        sudo rm -rf ~/.ccache
         find bin/targets -type f ! -name 'openwrt-amlogic-mesongx-phicomm_n1-rootfs.tar.gz' -delete
         find bin/targets -type d -empty -delete
         cd ..
