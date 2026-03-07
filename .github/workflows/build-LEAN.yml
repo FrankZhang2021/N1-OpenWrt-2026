@@ -9,7 +9,7 @@ env:
   CONFIG_FILE: N1-LEDE/.config
   DIY_SH: N1-LEDE/diy.sh
   FILES: N1-LEDE/files
-  PACKIT_MIN_FREE_GB: 6
+  PACKIT_MIN_FREE_GB: 1
   TZ: Asia/Shanghai
 
 jobs:
