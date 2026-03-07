@@ -28,8 +28,6 @@ git clone -b v5-lua --single-branch --depth 1 https://github.com/sbwml/luci-app-
 #git clone -b lua --single-branch --depth 1 https://github.com/sbwml/luci-app-alist package/alist
 #git clone --depth=1 https://github.com/gdy666/luci-app-lucky.git package/lucky
 
-
-
 ##添加自定义的软件包源
 #git_sparse_clone main https://github.com/kiddin9/kwrt-packages ddns-go
 #git_sparse_clone main https://github.com/kiddin9/kwrt-packages luci-app-ddns-go
