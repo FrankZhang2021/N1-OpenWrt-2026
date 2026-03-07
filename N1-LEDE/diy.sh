@@ -11,8 +11,10 @@ function git_sparse_clone() {
 
 # Add packages
 #添加科学上网源
-git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall-packages package/openwrt-passwall-packages
-git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall package/openwrt-passwall
+# 移除 openwrt feeds 自带的核心库
+rm -rf feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-libev,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,trojan-plus,tuic-client,v2ray-plugin,xray-plugin,geoview,shadow-tls}
+git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
+git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall package/passwall-luci
 
 git clone -b 18.06 --single-branch --depth 1 https://github.com/jerrykuku/luci-theme-argon package/luci-theme-argon
 git clone -b 18.06 --single-branch --depth 1 https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
@@ -26,9 +28,12 @@ git clone -b v5-lua --single-branch --depth 1 https://github.com/sbwml/luci-app-
 #git clone -b lua --single-branch --depth 1 https://github.com/sbwml/luci-app-alist package/alist
 #git clone --depth=1 https://github.com/gdy666/luci-app-lucky.git package/lucky
 
+
+
 ##添加自定义的软件包源
 #git_sparse_clone main https://github.com/kiddin9/kwrt-packages ddns-go
 #git_sparse_clone main https://github.com/kiddin9/kwrt-packages luci-app-ddns-go
+
 # Remove packages
 #删除lean库中的插件，使用自定义源中的包。
 rm -rf feeds/packages/net/v2ray-geodata
@@ -39,6 +44,7 @@ rm -rf feeds/packages/utils/v2dat
 rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/luci/themes/luci-theme-design
 rm -rf feeds/luci/applications/luci-app-design-config
+rm -rf feeds/luci/applications/luci-app-passwall
 
 # Default IP
 sed -i 's/192.168.1.1/192.168.5.2/g' package/base-files/files/bin/config_generate
