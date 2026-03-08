@@ -61,10 +61,23 @@ jobs:
         npm_clean: "True"
         os_swap: "True"
 
+    - name: Manual root partition cleanup
+      run: |
+        sudo rm -rf /usr/local/lib/android || true
+        sudo rm -rf /opt/ghc || true
+        sudo rm -rf /usr/local/.ghcup || true
+        sudo rm -rf /usr/share/dotnet || true
+        sudo rm -rf /usr/local/share/powershell || true
+        sudo rm -rf /usr/local/share/chromium || true
+        sudo rm -rf /usr/local/lib/node_modules || true
+        sudo rm -rf /opt/hostedtoolcache/CodeQL || true
+        sudo apt-get clean
+        df -hT
+
     - name: Freeing up disk space
       uses: easimon/maximize-build-space@master
       with: 
-        root-reserve-mb: 2048
+        root-reserve-mb: 6144
         swap-size-mb: 1
         remove-dotnet: 'true'
         remove-android: 'true'
@@ -86,6 +99,8 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+        sudo rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true
+        sudo -E apt-get clean
         sudo -E apt update
         sudo -E apt -y install \
           ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
