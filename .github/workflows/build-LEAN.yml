@@ -102,7 +102,12 @@ jobs:
         sudo rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true
         sudo -E apt-get clean
         sudo -E apt update
-        sudo -E apt -y install \
+        # Show available disk space before installing packages
+        echo "Disk space before apt install:"
+        df -h
+        # Use --no-install-recommends to avoid pulling in large recommended packages
+        # and prevent "No space left on device" errors on GitHub-hosted runners
+        sudo -E apt -y --no-install-recommends install \
           ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
           bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext \
           gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 \
@@ -115,6 +120,9 @@ jobs:
         sudo -E apt -y autoremove --purge
         sudo -E systemctl daemon-reload
         sudo -E apt clean
+        # Show available disk space after installing packages
+        echo "Disk space after apt install:"
+        df -h
         sudo timedatectl set-timezone "$TZ"
         sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
 
