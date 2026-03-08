@@ -9,7 +9,7 @@ env:
   CONFIG_FILE: N1-LEDE/.config
   DIY_SH: N1-LEDE/diy.sh
   FILES: N1-LEDE/files
-  PACKIT_MIN_FREE_GB: 1
+  PACKIT_MIN_FREE_GB: 4
   TZ: Asia/Shanghai
 
 jobs:
@@ -140,6 +140,18 @@ jobs:
         mixkey: amlogic-${{ env.REPO_BRANCH }}
         prefix: ${{ github.workspace }}/openwrt
         
+    - name: Check disk space before feeds
+      run: |
+        echo "[INFO] Disk space before feeds update:"
+        df -hT
+        AVAIL_MB=$(df -BM / | awk 'NR==2 {gsub("M", "", $4); print $4}')
+        THRESHOLD_MB=$((PACKIT_MIN_FREE_GB * 1024))
+        if [ "$AVAIL_MB" -lt "$THRESHOLD_MB" ]; then
+          echo "[ERROR] Insufficient disk space before feeds update: ${AVAIL_MB}MB available on root, need >= ${THRESHOLD_MB}MB (${PACKIT_MIN_FREE_GB}G)."
+          exit 1
+        fi
+        echo "[INFO] Disk pre-feeds check passed: ${AVAIL_MB}MB available on root."
+
     - name: Update & Install feeds
       working-directory: ./openwrt
       run: |
@@ -194,16 +206,24 @@ jobs:
         find bin/targets -type d -empty -delete
         cd ..
 
+        # Free root filesystem space that may have accumulated during the build
+        sudo apt-get clean || true
+        sudo rm -rf /tmp/* 2>/dev/null || true
+        sudo journalctl --vacuum-size=10M || true
+        sudo find /var/log -name "*.gz" -delete 2>/dev/null || true
+        sudo rm -rf /home/runner/.cache 2>/dev/null || true
+
         echo "[INFO] Disk usage after cleanup"
         df -hT
 
-        AVAIL_GB=$(df -BG / | awk 'NR==2 {gsub("G", "", $4); print $4}')
-        if [ "$AVAIL_GB" -lt "$PACKIT_MIN_FREE_GB" ]; then
-          echo "[ERROR] Insufficient disk space before packaging: ${AVAIL_GB}G available, need >= ${PACKIT_MIN_FREE_GB}G."
+        AVAIL_MB=$(df -BM / | awk 'NR==2 {gsub("M", "", $4); print $4}')
+        THRESHOLD_MB=$((PACKIT_MIN_FREE_GB * 1024))
+        if [ "$AVAIL_MB" -lt "$THRESHOLD_MB" ]; then
+          echo "[ERROR] Insufficient disk space before packaging: ${AVAIL_MB}MB available, need >= ${THRESHOLD_MB}MB (${PACKIT_MIN_FREE_GB}G)."
           exit 1
         fi
 
-        echo "[INFO] Disk check passed: ${AVAIL_GB}G available."
+        echo "[INFO] Disk check passed: ${AVAIL_MB}MB available."
 
     - name: Package OpenWrt Firmware
       if: ${{ success() && !cancelled() }}
