@@ -10,7 +10,6 @@ PLATFORM=amlogic
 SOC=s905d
 BOARD=n1
 
-# 让N1一直有wifi可用，以减少抱怨
 # 5.10(及以上)内核是否启用wifi  1:启用 0:禁用
 ENABLE_WIFI_K510=0
 
@@ -170,7 +169,6 @@ extract_glibc_programs
 adjust_docker_config
 adjust_openssl_config
 adjust_getty_config
-adjust_samba_config
 adjust_openssh_config
 use_xrayplug_replace_v2rayplug
 create_fstab_config
