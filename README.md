@@ -1,6 +1,6 @@
 # 项目简介
 本固件适配斐讯 N1 旁路由模式，追求轻量，不具备 PPPoE、WiFi 相关功能。<br>
-固件仅包含默认皮肤以及下列 luci-app：<br>
+固件包含 Argon 主题、Argon 配置插件以及下列 luci-app：<br>
 [luci-app-mosdns](https://github.com/sbwml/luci-app-mosdns)：DNS 分流与加速。<br>
 [luci-app-passwall](https://github.com/Openwrt-Passwall/openwrt-passwall)：传统代理工具。内存占用稍低、简单易用。<br>
 ***
