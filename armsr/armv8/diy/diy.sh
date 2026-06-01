@@ -11,6 +11,7 @@ rm -rf feeds/luci/applications/luci-app-passwall
 rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/packages/net/v2ray-geodata
 rm -rf feeds/packages/net/v2dat
+rm -rf feeds/packages/net/mosdns
 # 移除本地 package 中可能残留的主题和设置插件
 rm -rf package/luci-theme-argon
 rm -rf package/luci-app-argon-config
@@ -25,6 +26,7 @@ cp -rf clone/passwall/luci-app-passwall feeds/luci/applications/
 cp -rf clone/mosdns/luci-app-mosdns feeds/luci/applications/
 cp -rf clone/v2ray-geodata feeds/packages/net/
 cp -rf clone/passwall-packages/v2dat feeds/packages/net/
+cp -rf clone/mosdns/mosdns feeds/packages/net/
 
 
 
