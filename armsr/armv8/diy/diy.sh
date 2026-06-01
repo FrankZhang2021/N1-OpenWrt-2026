@@ -10,6 +10,7 @@ patch -p1 -f < $(dirname "$0")/luci.patch
 rm -rf feeds/luci/applications/luci-app-passwall
 rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/packages/net/v2ray-geodata
+rm -rf feeds/packages/net/v2dat
 # 移除本地 package 中可能残留的主题和设置插件
 rm -rf package/luci-theme-argon
 rm -rf package/luci-app-argon-config
@@ -17,11 +18,13 @@ rm -rf package/luci-app-argon-config
 git clone https://github.com/Openwrt-Passwall/openwrt-passwall --depth=1 clone/passwall
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 --depth=1 clone/mosdns
 git clone https://github.com/sbwml/v2ray-geodata --depth=1 clone/v2ray-geodata
+git clone https://github.com/xiaorouji/openwrt-passwall-packages --depth=1 clone/passwall-packages
 git clone https://github.com/jerrykuku/luci-theme-argon --depth=1 package/luci-theme-argon
 git clone https://github.com/jerrykuku/luci-app-argon-config --depth=1 package/luci-app-argon-config
 cp -rf clone/passwall/luci-app-passwall feeds/luci/applications/
 cp -rf clone/mosdns/luci-app-mosdns feeds/luci/applications/
 cp -rf clone/v2ray-geodata feeds/packages/net/
+cp -rf clone/passwall-packages/v2dat feeds/packages/net/
 
 
 
