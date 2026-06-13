@@ -35,8 +35,14 @@ git clone https://github.com/jerrykuku/luci-app-argon-config --depth=1 package/l
 cp -rf clone/passwall/luci-app-passwall feeds/luci/applications/
 cp -rf clone/mosdns/luci-app-mosdns feeds/luci/applications/
 cp -rf clone/v2ray-geodata feeds/packages/net/
-cp -rf clone/passwall-packages/v2dat feeds/packages/net/
 cp -rf clone/mosdns/mosdns feeds/packages/net/
+
+if [ -d clone/mosdns/v2dat ]; then
+  cp -rf clone/mosdns/v2dat feeds/packages/net/
+else
+  echo "ERROR: v2dat package not found in clone/mosdns"
+  exit 1
+fi
 
 sed -i '/luci-app-attendedsysupgrade/d' feeds/luci/collections/luci/Makefile
 
