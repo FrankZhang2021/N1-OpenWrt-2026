@@ -28,7 +28,6 @@ rm -rf package/v2dat
 git clone https://github.com/Openwrt-Passwall/openwrt-passwall --depth=1 clone/passwall
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 --depth=1 clone/mosdns
 git clone https://github.com/sbwml/v2ray-geodata --depth=1 clone/v2ray-geodata
-git clone https://github.com/xiaorouji/openwrt-passwall-packages --depth=1 clone/passwall-packages
 git clone https://github.com/jerrykuku/luci-theme-argon --depth=1 package/luci-theme-argon
 git clone https://github.com/jerrykuku/luci-app-argon-config --depth=1 package/luci-app-argon-config
 
