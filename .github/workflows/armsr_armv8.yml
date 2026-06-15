@@ -101,10 +101,11 @@ jobs:
           exit 1
         fi
 
-        ROOTFS="$(python3 - <<'PY'
+        ROOTFS="$(TARGET_DIR="$TARGET_DIR" python3 - <<'PY'
+        from os import environ
         from pathlib import Path
 
-        target_dir = Path("openwrt/bin/targets/armsr/armv8")
+        target_dir = Path(environ["TARGET_DIR"])
         matches = sorted(
             (path for path in target_dir.glob("*rootfs*.tar.gz") if path.is_file()),
             key=lambda path: path.stat().st_mtime,
