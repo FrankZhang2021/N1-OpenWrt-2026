@@ -101,22 +101,24 @@ jobs:
           exit 1
         fi
 
-        readarray -d '' ROOTFS_FILES < <(find "$TARGET_DIR" -maxdepth 1 -type f -name '*rootfs*.tar.gz' -print0)
-        if [ "${#ROOTFS_FILES[@]}" -eq 0 ]; then
+        ROOTFS="$(python3 - <<'PY'
+        from pathlib import Path
+
+        target_dir = Path("openwrt/bin/targets/armsr/armv8")
+        matches = sorted(
+            (path for path in target_dir.glob("*rootfs*.tar.gz") if path.is_file()),
+            key=lambda path: path.stat().st_mtime,
+            reverse=True,
+        )
+        if matches:
+            print(matches[0].as_posix())
+        PY
+        )"
+        if [ -z "$ROOTFS" ]; then
           echo "::error::No rootfs tarball matching *rootfs*.tar.gz found in $TARGET_DIR"
           ls -lah "$TARGET_DIR" || true
           exit 1
         fi
-
-        ROOTFS=""
-        ROOTFS_MTIME=0
-        for CANDIDATE in "${ROOTFS_FILES[@]}"; do
-          CANDIDATE_MTIME="$(stat -c '%Y' "$CANDIDATE")"
-          if [ -z "$ROOTFS" ] || [ "$CANDIDATE_MTIME" -gt "$ROOTFS_MTIME" ]; then
-            ROOTFS="$CANDIDATE"
-            ROOTFS_MTIME="$CANDIDATE_MTIME"
-          fi
-        done
 
         echo "Using rootfs tarball: $ROOTFS"
         echo "rootfs=$ROOTFS" >> "$GITHUB_OUTPUT"
