@@ -101,7 +101,7 @@ jobs:
           exit 1
         fi
 
-        ROOTFS="$(find "$TARGET_DIR" -maxdepth 1 -type f -name '*rootfs*.tar.gz' | sort | head -n 1)"
+        ROOTFS="$(find "$TARGET_DIR" -maxdepth 1 -type f -name '*rootfs*.tar.gz' -printf '%T@ %p\n' | sort -rn | head -n 1 | cut -d' ' -f2-)"
         if [ -z "$ROOTFS" ]; then
           echo "::error::No rootfs tarball matching *rootfs*.tar.gz found in $TARGET_DIR"
           ls -lah "$TARGET_DIR" || true
