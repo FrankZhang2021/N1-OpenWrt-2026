@@ -101,13 +101,16 @@ jobs:
           exit 1
         fi
 
-        ROOTFS="$(find "$TARGET_DIR" -maxdepth 1 -type f -name '*rootfs*.tar.gz' -printf '%T@ %p\n' | sort -rn | head -n 1 | cut -d' ' -f2-)"
-        if [ -z "$ROOTFS" ]; then
+        shopt -s nullglob
+        ROOTFS_FILES=("$TARGET_DIR"/*rootfs*.tar.gz)
+        shopt -u nullglob
+        if [ "${#ROOTFS_FILES[@]}" -eq 0 ]; then
           echo "::error::No rootfs tarball matching *rootfs*.tar.gz found in $TARGET_DIR"
           ls -lah "$TARGET_DIR" || true
           exit 1
         fi
 
+        ROOTFS="$(ls -t "${ROOTFS_FILES[@]}" | head -n 1)"
         echo "Using rootfs tarball: $ROOTFS"
         echo "rootfs=$ROOTFS" >> "$GITHUB_OUTPUT"
 
