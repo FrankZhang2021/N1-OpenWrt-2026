@@ -93,7 +93,7 @@ jobs:
     - name: Package N1 firmware
       uses: unifreq/openwrt_packit@master
       env:
-        OPENWRT_ARMVIRT: openwrt/bin/targets/armsr/armv8/*rootfs.tar.gz
+        OPENWRT_ARMVIRT: openwrt/bin/targets/armsr/armv8/openwrt-armsr-armv8-generic-rootfs.tar.gz
         KERNEL_REPO_URL: ophub/kernel
         KERNEL_VERSION_NAME: 6.12.y
         PACKAGE_SOC: diy
