@@ -95,28 +95,32 @@ jobs:
       shell: bash
       run: |
         TARGET_DIR="openwrt/bin/targets/armsr/armv8"
+        ROOTFS_PATTERN="*rootfs*.tar.gz"
         if [ ! -d "$TARGET_DIR" ]; then
           echo "::error::Target directory not found: $TARGET_DIR"
           ls -lah openwrt/bin/targets/armsr || true
           exit 1
         fi
 
-        ROOTFS="$(TARGET_DIR="$TARGET_DIR" python3 - <<'PY'
+        ROOTFS="$(TARGET_DIR="$TARGET_DIR" ROOTFS_PATTERN="$ROOTFS_PATTERN" python3 - <<'PY'
         from os import environ
         from pathlib import Path
 
         target_dir = Path(environ["TARGET_DIR"])
+        rootfs_pattern = environ["ROOTFS_PATTERN"]
         matches = sorted(
-            (path for path in target_dir.glob("*rootfs*.tar.gz") if path.is_file()),
+            (path for path in target_dir.glob(rootfs_pattern) if path.is_file()),
             key=lambda path: path.stat().st_mtime,
             reverse=True,
         )
         if matches:
             print(matches[0].as_posix())
+        else:
+            print("__ROOTFS_NOT_FOUND__")
         PY
         )"
-        if [ -z "$ROOTFS" ]; then
-          echo "::error::No rootfs tarball matching *rootfs*.tar.gz found in $TARGET_DIR"
+        if [ "$ROOTFS" = "__ROOTFS_NOT_FOUND__" ]; then
+          echo "::error::No rootfs tarball matching $ROOTFS_PATTERN found in $TARGET_DIR"
           ls -lah "$TARGET_DIR" || true
           exit 1
         fi
