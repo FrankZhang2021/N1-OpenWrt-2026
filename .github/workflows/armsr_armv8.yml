@@ -101,16 +101,23 @@ jobs:
           exit 1
         fi
 
-        shopt -s nullglob
-        ROOTFS_FILES=("$TARGET_DIR"/*rootfs*.tar.gz)
-        shopt -u nullglob
+        readarray -d '' ROOTFS_FILES < <(find "$TARGET_DIR" -maxdepth 1 -type f -name '*rootfs*.tar.gz' -print0)
         if [ "${#ROOTFS_FILES[@]}" -eq 0 ]; then
           echo "::error::No rootfs tarball matching *rootfs*.tar.gz found in $TARGET_DIR"
           ls -lah "$TARGET_DIR" || true
           exit 1
         fi
 
-        ROOTFS="$(ls -t "${ROOTFS_FILES[@]}" | head -n 1)"
+        ROOTFS=""
+        ROOTFS_MTIME=0
+        for CANDIDATE in "${ROOTFS_FILES[@]}"; do
+          CANDIDATE_MTIME="$(stat -c '%Y' "$CANDIDATE")"
+          if [ -z "$ROOTFS" ] || [ "$CANDIDATE_MTIME" -gt "$ROOTFS_MTIME" ]; then
+            ROOTFS="$CANDIDATE"
+            ROOTFS_MTIME="$CANDIDATE_MTIME"
+          fi
+        done
+
         echo "Using rootfs tarball: $ROOTFS"
         echo "rootfs=$ROOTFS" >> "$GITHUB_OUTPUT"
 
