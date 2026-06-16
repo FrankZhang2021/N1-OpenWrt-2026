@@ -93,11 +93,14 @@ jobs:
     - name: Find rootfs archive
       id: find_rootfs
       run: |
-        ROOTFS_FILE=$(find openwrt/bin/targets/armsr/armv8 -maxdepth 1 -type f -name '*rootfs*.tar.gz' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)
-        if [ -z "$ROOTFS_FILE" ]; then
+        shopt -s nullglob
+        ROOTFS_FILES=(openwrt/bin/targets/armsr/armv8/*rootfs*.tar.gz)
+        shopt -u nullglob
+        if [ ${#ROOTFS_FILES[@]} -eq 0 ]; then
           echo "No rootfs archive found in openwrt/bin/targets/armsr/armv8" >&2
           exit 1
         fi
+        ROOTFS_FILE=$(ls -t "${ROOTFS_FILES[@]}" | head -n1)
         echo "Using rootfs archive: $ROOTFS_FILE"
         echo "rootfs_file=$ROOTFS_FILE" >> "$GITHUB_OUTPUT"
 
