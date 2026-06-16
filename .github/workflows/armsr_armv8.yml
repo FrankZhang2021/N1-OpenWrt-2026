@@ -100,7 +100,15 @@ jobs:
           echo "No rootfs archive found in openwrt/bin/targets/armsr/armv8" >&2
           exit 1
         fi
-        ROOTFS_FILE=$(ls -t "${ROOTFS_FILES[@]}" | head -n1)
+        ROOTFS_FILE=""
+        ROOTFS_MTIME=0
+        for file in "${ROOTFS_FILES[@]}"; do
+          file_mtime=$(stat -c %Y "$file")
+          if [ "$file_mtime" -gt "$ROOTFS_MTIME" ]; then
+            ROOTFS_MTIME="$file_mtime"
+            ROOTFS_FILE="$file"
+          fi
+        done
         echo "Using rootfs archive: $ROOTFS_FILE"
         echo "rootfs_file=$ROOTFS_FILE" >> "$GITHUB_OUTPUT"
 
