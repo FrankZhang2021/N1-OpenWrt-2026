@@ -39,8 +39,7 @@ cp -rf clone/mosdns/mosdns feeds/packages/net/
 if [ -d clone/mosdns/v2dat ]; then
   cp -rf clone/mosdns/v2dat feeds/packages/net/
 else
-  echo "ERROR: v2dat package not found in clone/mosdns"
-  exit 1
+  echo "INFO: v2dat package not found in clone/mosdns, skip copying"
 fi
 
 sed -i '/luci-app-attendedsysupgrade/d' feeds/luci/collections/luci/Makefile
