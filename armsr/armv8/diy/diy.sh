@@ -35,6 +35,7 @@ cp -rf clone/passwall/luci-app-passwall feeds/luci/applications/
 cp -rf clone/mosdns/luci-app-mosdns feeds/luci/applications/
 cp -rf clone/v2ray-geodata feeds/packages/net/
 cp -rf clone/mosdns/mosdns feeds/packages/net/
+cp -rf clone/mosdns/geo2txt feeds/packages/net/
 
 if [ -d clone/mosdns/v2dat ]; then
   cp -rf clone/mosdns/v2dat feeds/packages/net/
